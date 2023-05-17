@@ -1,8 +1,7 @@
 # Group Identification
-
- - FirstName LastName, IST number, Email
- - FirstName LastName, IST number, Email
- - FirstName LastName, IST number, Email
+ - Lourenço Abecasis, 93931, lourenco.abecasis@tecnico.ulisboa.pt 
+ - Francisco Abrunhosa, 95580, francisco.abrunhosa@tecnico.ulisboa.pt
+ - João Silveira, 95597, joao.freixial.silveira@tecnico.ulisboa.pt
 
 # Implemented Features
 TODO: Identify what you have done and, in particular, **identify any missing features**.
