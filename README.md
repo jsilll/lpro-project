@@ -11,3 +11,8 @@ TODO: Identify what you have done and, in particular, **identify any missing fea
 # Extras
 TODO: Identify and describe additional work that you have done,
       so that it can be considered for extra credits.
+
+# How to Generate the Makefile
+```
+coq_makefile -f _CoqProject -o Makefile
+```

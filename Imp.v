@@ -174,7 +174,7 @@ Proof. reflexivity. Qed.
 
 Inductive com : Type :=
   | CSkip
-(* TODO *)
+  | CBreak
   | CAsgn (x : string) (a : aexp)
   | CSeq (c1 c2 : com)
   | CIf (b : bexp) (c1 c2 : com)
@@ -187,6 +187,7 @@ Inductive com : Type :=
 
 
 (* TODO *)
+Notation "'break'" := CBreak (in custom com at level 0).
 Notation "'skip'"  :=
          CSkip (in custom com at level 0) : com_scope.
 Notation "x := y"  :=
@@ -208,6 +209,7 @@ Notation "'while' x 'do' y 'end'" :=
   1.3. TODO: Define the programs p1 and p2 as specified in the project brief.
 *)
 
-Definition p1 := (* TODO *)
+(* TODO *)
+(* Definition p1 := 
 
-Definition p2 := (* TODO *)
+Definition p2 := (* TODO *) *)
