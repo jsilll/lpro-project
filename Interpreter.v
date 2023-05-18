@@ -22,24 +22,26 @@ From FirstProject Require Import RelationalEvaluation.
     bit of auxiliary notation to hide the plumbing involved in
     repeatedly matching against optional states. *)
 
-(*
 Notation "'LETOPT' x <== e1 'IN' e2"
    := (match e1 with
          | Some x => e2
          | None => None
        end)
    (right associativity, at level 60).
-*)
 
 (** 2.1. TODO: Implement ceval_step as specified. To improve readability,
                you are strongly encouraged to define auxiliary notation.
                See the notation LETOPT commented above (or in the ImpCEval chapter).
 *)
 
-Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
+Definition ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
   match i with
   | O => None
-  | S i' =>
+  | S i' => match c with
+            | <{ skip }> => Some (st, SContinue)
+            | <{ break }> => Some (st, SBreak)
+            | _ => None
+            end
   (* TODO *)
 end.
 
@@ -62,7 +64,6 @@ Example example_test_ceval :
 
      = Some (2, 0, 4).
 Proof. reflexivity. Qed.
-
 
 (** 
   2.2. TODO: Prove the following three properties.

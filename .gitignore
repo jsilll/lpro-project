@@ -16,7 +16,11 @@ Makefile
 .Makefile.d
 Makefile.conf
 
+.Interpreter.aux
+Interpreter.glob
+
+RelationalEvaluation.vo
+RelationalEvaluation.vok
+RelationalEvaluation.vos
 .RelationalEvaluation.aux
 RelationalEvaluation.glob
-
-
