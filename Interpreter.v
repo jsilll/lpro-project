@@ -34,15 +34,38 @@ Notation "'LETOPT' x <== e1 'IN' e2"
                See the notation LETOPT commented above (or in the ImpCEval chapter).
 *)
 
-Definition ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
+Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
   match i with
   | O => None
   | S i' => match c with
-            | <{ skip }> => Some (st, SContinue)
             | <{ break }> => Some (st, SBreak)
-            | _ => None
+            | <{ skip }> => Some (st, SContinue)
+            | <{ x := a1 }> => Some (x !-> (aeval st a1) ; st, SContinue)
+
+            | <{ c1 ; c2 }> => match ceval_step st c1 i' with
+                                | Some (st', r) => match r with
+                                                   | SContinue => ceval_step st' c2 i'
+                                                   | SBreak => Some (st', SBreak)
+                                                   end
+                                | None => None
+                               end
+
+            | <{ if b then c1 else c2 end }> => match beval st b with
+                                                | true => ceval_step st c1 i'
+                                                | false => ceval_step st c2 i'
+                                                end
+
+            | <{ while b do c end }> => match beval st b with
+                                        | true => match ceval_step st c i' with
+                                                  | Some (st', r) => match r with
+                                                                     | SContinue => ceval_step st' <{ while b do c end }> i'
+                                                                     | SBreak => Some (st', SContinue)
+                                                                     end
+                                                  | None => None
+                                                  end
+                                        | false => Some (st, SContinue)
+                                        end
             end
-  (* TODO *)
 end.
 
 (* The following definition is taken from the book and it can be used to
@@ -63,6 +86,16 @@ Example example_test_ceval :
         end }>
 
      = Some (2, 0, 4).
+Proof. reflexivity. Qed.
+
+Example example_test_ceval2 :
+     test_ceval empty_st
+
+     <{ while true do
+          skip
+        end }>
+
+     = None.
 Proof. reflexivity. Qed.
 
 (** 
