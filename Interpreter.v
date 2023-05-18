@@ -43,11 +43,11 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
             | <{ x := a1 }> => Some (x !-> (aeval st a1) ; st, SContinue)
 
             | <{ c1 ; c2 }> => match ceval_step st c1 i' with
-                                | Some (st', r) => match r with
-                                                   | SContinue => ceval_step st' c2 i'
-                                                   | SBreak => Some (st', SBreak)
-                                                   end
-                                | None => None
+                               | Some (st', r) => match r with
+                                                  | SContinue => ceval_step st' c2 i'
+                                                  | SBreak => Some (st', SBreak)
+                                                  end
+                               | None => None
                                end
 
             | <{ if b then c1 else c2 end }> => match beval st b with
@@ -110,7 +110,11 @@ ceval_step st <{ break; c }> i1
 ceval_step st <{ break; skip }> i1
 ).
 Proof.
-  (* TODO *)
+  intros. exists 0. induction c; induction i1.
+  - reflexivity.
+  - destruct (S i1 >= 0).
+
+
 Qed.
 
 (* TODO *)
