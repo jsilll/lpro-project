@@ -1,4 +1,5 @@
 .coq-native/
+.lia.cache
 
 Imp.vo
 Imp.vok

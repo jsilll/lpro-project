@@ -110,11 +110,12 @@ ceval_step st <{ break; c }> i1
 ceval_step st <{ break; skip }> i1
 ).
 Proof.
-  intros. exists 0. induction c; induction i1.
-  - reflexivity.
-  - destruct (S i1 >= 0).
-
-
+  intros. exists 0.
+  intros. destruct i1 as [ | i1'].
+  - simpl. reflexivity.
+  - simpl. destruct i1'.
+    * simpl. reflexivity.
+    * simpl. reflexivity.  
 Qed.
 
 (* TODO *)
@@ -126,17 +127,48 @@ ceval_step st <{ break; c }> i1
 ceval_step st <{ skip }> i1
 ).
 Proof.
-  (* TODO *)
+  intros. exists 1.
+  intros. destruct i1 as [ | i1'].
+  - lia. (* É assim que devo fazer???
+  Aqui a questão é que se i1 >= 1, então i1 != 0, pelo que não seria necessário considerar esse caso. *)
+  - simpl. destruct i1'.
+    * simpl. discriminate.
+    * simpl. discriminate.
 Qed.
 
-(* TODO *)
+Compute ceval_step empty_st p1 6.
+Compute ceval_step empty_st p2 5.
+
+
+(* TODO *) 
 Theorem p1_equivalent_p2: forall st,
   (exists i0,
     forall i1, i1>=i0 ->
       ceval_step st p1 i1 = ceval_step st p2 i1
   ).
 Proof.
-  (* TODO *)
+  intros. exists 6.
+  intros. destruct i1.
+  { lia. }
+  { simpl. destruct i1.
+    { lia. }
+    { simpl. destruct i1.
+      { lia. }
+      { simpl. destruct i1.
+        { lia. }
+        { simpl. destruct i1.
+          { lia. }
+          { simpl. destruct i1.
+            { lia. }
+            { simpl. destruct i1.
+              { reflexivity. }
+              { reflexivity. }
+            }
+          }
+        }
+      }
+    }
+  }
 Qed.
 
 
