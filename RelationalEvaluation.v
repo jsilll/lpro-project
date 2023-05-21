@@ -103,9 +103,41 @@ Reserved Notation "st '=[' c ']=>' st' '/' s"
 *)
 
 Inductive ceval : com -> state -> result -> state -> Prop :=
+  | E_Break : forall st,
+      st =[ CBreak ]=> st / SBreak
   | E_Skip : forall st,
       st =[ CSkip ]=> st / SContinue
-
+  | E_Asgn : forall st a n x,
+    aeval st a = n ->
+     st =[ x := a ]=> (x !-> n ; st) / SContinue
+  | E_Seq_Break : forall c1 c2 st st',
+     st  =[ c1 ]=> st' / SBreak  ->
+     st  =[ c1 ; c2 ]=> st' / SBreak
+  | E_Seq_Continue : forall c1 c2 st st' st'' s,
+     st  =[ c1 ]=> st' / SContinue ->
+     st' =[ c2 ]=> st'' / s ->
+     st  =[ c1 ; c2 ]=> st'' / s
+  | E_IfTrue : forall st st' b c1 c2 s,
+      beval st b = true ->
+      st =[ c1 ]=> st' / s ->
+      st =[ if b then c1 else c2 end]=> st' / s
+  | E_IfFalse : forall st st' b c1 c2 s,
+      beval st b = false ->
+      st =[ c2 ]=> st' / s ->
+      st =[ if b then c1 else c2 end]=> st' / s
+  | E_WhileFalse : forall b st c,
+      beval st b = false ->
+      st =[ while b do c end ]=> st / SContinue
+  | E_WhileTrue_Break : forall st st' b c,
+      beval st b = true ->
+      st  =[ c ]=> st' / SBreak ->
+      st  =[ while b do c end ]=> st' / SContinue
+  | E_WhileTrue_Continue : forall st st' st'' b c,
+      beval st b = true ->
+      st  =[ c ]=> st' / SContinue ->
+      st' =[ while b do c end ]=> st'' / SContinue ->
+      st  =[ while b do c end ]=> st'' / SContinue
+      
   (* TODO *)
 
   where "st '=[' c ']=>' st' '/' s" := (ceval c st s st').
