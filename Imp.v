@@ -210,7 +210,8 @@ Notation "'while' x 'do' y 'end'" :=
 *)
 
 (* TODO *)
-Definition p1 := <{ X := 1; Y := 0; 
+Definition p1 := <{ X := 1; 
+                    Y := 0; 
                     while true do 
                       if X = 0 
                       then break 
@@ -221,8 +222,10 @@ Definition p1 := <{ X := 1; Y := 0;
                     end
                   }>. 
 
-Definition p2 := <{ X := 1; Y := 0; 
+Definition p2 := <{ X := 1;
+                    Y := 0; 
                     while ~(X = 0) do 
-                        Y := Y + 1; X := X - 1
+                        Y := Y + 1;
+                        X := X - 1
                     end
                   }>. 
