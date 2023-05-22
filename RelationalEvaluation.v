@@ -193,5 +193,5 @@ Theorem while_break_true : forall b c st st',
   beval st' b = true ->
   exists st'', st'' =[ c ]=> st' / SBreak.
 Proof.
-  intros. apply E_WhileTrueContinue.
+  intros. inversion H. (* parece que há coisas contraditórias... *)
 Qed.
