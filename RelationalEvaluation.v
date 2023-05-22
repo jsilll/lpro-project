@@ -110,10 +110,10 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
   | E_Asgn : forall st a n x,
     aeval st a = n ->
      st =[ x := a ]=> (x !-> n ; st) / SContinue
-  | E_Seq_Break : forall c1 c2 st st',
+  | E_SeqBreak : forall c1 c2 st st',
      st  =[ c1 ]=> st' / SBreak  ->
      st  =[ c1 ; c2 ]=> st' / SBreak
-  | E_Seq_Continue : forall c1 c2 st st' st'' s,
+  | E_SeqContinue : forall c1 c2 st st' st'' s,
      st  =[ c1 ]=> st' / SContinue ->
      st' =[ c2 ]=> st'' / s ->
      st  =[ c1 ; c2 ]=> st'' / s
@@ -128,17 +128,16 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
   | E_WhileFalse : forall b st c,
       beval st b = false ->
       st =[ while b do c end ]=> st / SContinue
-  | E_WhileTrue_Break : forall st st' b c,
+  | E_WhileTrueBreak : forall st st' b c,
       beval st b = true ->
       st  =[ c ]=> st' / SBreak ->
       st  =[ while b do c end ]=> st' / SContinue
-  | E_WhileTrue_Continue : forall st st' st'' b c,
+  | E_WhileTrueContinue : forall st st' st'' b c,
       beval st b = true ->
       st  =[ c ]=> st' / SContinue ->
       st' =[ while b do c end ]=> st'' / SContinue ->
       st  =[ while b do c end ]=> st'' / SContinue
       
-  (* TODO *)
 
   where "st '=[' c ']=>' st' '/' s" := (ceval c st s st').
 
@@ -154,15 +153,17 @@ Theorem break_ignore : forall c st st' s,
      st =[ break; c ]=> st' / s ->
      st = st'.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. inversion H. 
+  - inversion H5. reflexivity. 
+  - inversion H2. 
+Qed.
 
 Theorem while_continue : forall b c st st' s,
   st =[ while b do c end ]=> st' / s ->
   s = SContinue.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. inversion H; reflexivity. 
+Qed.
 
 Theorem while_stops_on_break : forall b c st st',
   beval st b = true ->

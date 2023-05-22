@@ -11,7 +11,7 @@
 
 ### Task 2 (Interpreter.v)
 - Implementation of step-indexed evaluator - João Silveira and Lourenço Abecasis
-- Proof of equivalence1 - Lourneço Abecasis
+- Proof of equivalence1 - Lourenço Abecasis
 - Proof of inequivalence1 - Everyone (DUVIDA)
 - Proof of p1_equivalent_p2 - Everyone (DUVIDA)
 

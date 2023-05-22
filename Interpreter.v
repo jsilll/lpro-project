@@ -42,6 +42,7 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
             | <{ skip }> => Some (st, SContinue)
             | <{ x := a1 }> => Some (x !-> (aeval st a1) ; st, SContinue)
 
+            (* Seq *)
             | <{ c1 ; c2 }> => match ceval_step st c1 i' with
                                | Some (st', r) => match r with
                                                   | SContinue => ceval_step st' c2 i'
@@ -49,12 +50,12 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
                                                   end
                                | None => None
                                end
-
+            (* If *)
             | <{ if b then c1 else c2 end }> => match beval st b with
                                                 | true => ceval_step st c1 i'
                                                 | false => ceval_step st c2 i'
                                                 end
-
+            (* While *)
             | <{ while b do c end }> => match beval st b with
                                         | true => match ceval_step st c i' with
                                                   | Some (st', r) => match r with

@@ -32,7 +32,7 @@ ceval_step st c i1 = Some (st', res) ->
 ceval_step st c i2 = Some (st', res).
 Proof.
   (* TODO *)
-Qed.
+Admitted.
 
 
 (* ################################################################# *)
@@ -58,7 +58,7 @@ induction i as [| i' ].
 
 (* TODO *)
 
-Qed.
+Admitted.
 
 (** 
   TODO: For the following proof, you'll need [ceval_step_more] in a
@@ -69,7 +69,7 @@ Theorem ceval__ceval_step: forall c st st' res,
     exists i, ceval_step st c i = Some (st', res).
 Proof.
   (* TODO *)
-Qed. 
+Admitted. 
 
 
 
@@ -83,7 +83,7 @@ intros c st st'.
 split. 
  - apply ceval__ceval_step. 
  - apply ceval_step__ceval.
-Qed.
+Admitted.
 
 
 (* ################################################################# *)
@@ -111,4 +111,4 @@ apply ceval_step_more with (i2 := i1 + i2) in E1.
   -- rewrite E1 in E2. inversion E2. reflexivity.
   -- lia. 
  - lia.  
- Qed.
+Admitted.
