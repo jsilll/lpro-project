@@ -185,13 +185,13 @@ Theorem seq_stops_on_break : forall c1 c2 st st',
   st =[ c1 ]=> st' / SBreak ->
   st =[ c1 ; c2 ]=> st' / SBreak.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. apply E_SeqBreak. assumption. 
+Qed.
 
 Theorem while_break_true : forall b c st st',
   st =[ while b do c end ]=> st' / SContinue ->
   beval st' b = true ->
   exists st'', st'' =[ c ]=> st' / SBreak.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. apply E_WhileTrueContinue.
+Qed.
