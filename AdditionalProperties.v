@@ -80,7 +80,8 @@ Proof.
   generalize dependent st.
   generalize dependent c.
   induction i as [| i' ].
-
+    - intros. inversion E.
+    - intros.  
 (* TODO *)
 
 Admitted.
