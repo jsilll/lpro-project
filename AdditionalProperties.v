@@ -26,12 +26,37 @@ Set Default Goal Selector "!".
 (* ################################################################# *)
 (** * Property of the Step-Indexed Interpreter *)
 
+(**
+  This property states that if a given program
+  evaluates to a state st' and a result res in
+  i max steps, then it also evaluates to the same
+  state st' and result res in i + 1 steps.
+*)
 Theorem ceval_step_more: forall i1 i2 st st' res c,
 i1 <= i2 ->
 ceval_step st c i1 = Some (st', res) ->
 ceval_step st c i2 = Some (st', res).
 Proof.
-  (* TODO *)
+  induction i1 as [| i1' IH]; intros i2 st st' res c Hle Hceval.
+  - (* i1 = 0 *)
+    simpl. discriminate.
+  - (* i1 = S i1' *)
+    destruct i2.
+    + (* i2 = 0; contradiction *)
+      inversion Hle.
+    + (* i2 = S i2' *)
+      destruct c; simpl.
+      * (* Skip *)
+        inversion Hceval; subst. reflexivity.
+      * (* Break *)
+        inversion Hceval; subst. reflexivity.
+      * (* Assign *)
+        inversion Hceval; subst. reflexivity.
+      * (* Sequence *)
+        simpl in Hceval.
+        destruct (ceval_step st c1 i1') eqn:Heqst1res1.
+        ** (* Some (st1, res1) *)
+          (* TODO *)
 Admitted.
 
 
@@ -47,14 +72,14 @@ Theorem ceval_step__ceval: forall c st st' res,
     (exists i, ceval_step st c i = Some (st', res)) ->
     st =[ c ]=> st' / res.
 Proof.
-intros c st st' res H.
-inversion H as [i E].
-clear H.
-generalize dependent res.
-generalize dependent st'.
-generalize dependent st.
-generalize dependent c.
-induction i as [| i' ].
+  intros c st st' res H.
+  inversion H as [i E].
+  clear H.
+  generalize dependent res.
+  generalize dependent st'.
+  generalize dependent st.
+  generalize dependent c.
+  induction i as [| i' ].
 
 (* TODO *)
 
@@ -96,19 +121,27 @@ Admitted.
 (* TODO: Write/explain the following proof in natural language, 
          using your own words. *)  
 
+(**
+  This theorem states that the evaluation relation is deterministic.
+  To prove this, we need to show that the step-indexed evaluations
+  st1 and st2 are the same.
+
+  
+*)
+
 Theorem ceval_deterministic' : forall c st st1 st2 res1 res2,
    st =[ c ]=> st1 / res1 ->
    st =[ c ]=> st2 / res2 ->
    st1 = st2.
 Proof.
-intros c st st1 st2 res1 res2 He1 He2.
-apply ceval__ceval_step in He1.
-apply ceval__ceval_step in He2.
-inversion He1 as [i1 E1].
-inversion He2 as [i2 E2].
-apply ceval_step_more with (i2 := i1 + i2) in E1.
- - apply ceval_step_more with (i2 := i1 + i2) in E2.
-  -- rewrite E1 in E2. inversion E2. reflexivity.
-  -- lia. 
- - lia.  
+  intros c st st1 st2 res1 res2 He1 He2.
+  apply ceval__ceval_step in He1.
+  apply ceval__ceval_step in He2.
+  inversion He1 as [i1 E1].
+  inversion He2 as [i2 E2].
+  apply ceval_step_more with (i2 := i1 + i2) in E1.
+   - apply ceval_step_more with (i2 := i1 + i2) in E2.
+    -- rewrite E1 in E2. inversion E2. reflexivity.
+    -- lia. 
+   - lia.  
 Admitted.

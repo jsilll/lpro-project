@@ -98,18 +98,25 @@ Reserved Notation "st '=[' c ']=>' st' '/' s"
       iteration.  In either case, since [break] only terminates the
       innermost loop, [while] signals [SContinue]. *)
 
-(** 3.1. TODO: Based on the above description, complete the definition of the
+(** 3.1. DONE: Based on the above description, complete the definition of the
                [ceval] relation. 
 *)
 
 Inductive ceval : com -> state -> result -> state -> Prop :=
+  (* Break *)
   | E_Break : forall st,
       st =[ CBreak ]=> st / SBreak
+
+  (* Skip *)
   | E_Skip : forall st,
       st =[ CSkip ]=> st / SContinue
+
+  (* Assignment *)
   | E_Asgn : forall st a n x,
     aeval st a = n ->
      st =[ x := a ]=> (x !-> n ; st) / SContinue
+
+  (* Sequence *)
   | E_SeqBreak : forall c1 c2 st st',
      st  =[ c1 ]=> st' / SBreak  ->
      st  =[ c1 ; c2 ]=> st' / SBreak
@@ -117,6 +124,8 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
      st  =[ c1 ]=> st' / SContinue ->
      st' =[ c2 ]=> st'' / s ->
      st  =[ c1 ; c2 ]=> st'' / s
+
+  (* If *)
   | E_IfTrue : forall st st' b c1 c2 s,
       beval st b = true ->
       st =[ c1 ]=> st' / s ->
@@ -125,6 +134,8 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
       beval st b = false ->
       st =[ c2 ]=> st' / s ->
       st =[ if b then c1 else c2 end]=> st' / s
+
+  (* While *)
   | E_WhileFalse : forall b st c,
       beval st b = false ->
       st =[ while b do c end ]=> st / SContinue
@@ -138,9 +149,7 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
       st' =[ while b do c end ]=> st'' / SContinue ->
       st  =[ while b do c end ]=> st'' / SContinue
       
-
   where "st '=[' c ']=>' st' '/' s" := (ceval c st s st').
-
 
 (** 
   3.2. TODO: Prove the following six properties of your definition of [ceval].
@@ -193,5 +202,5 @@ Theorem while_break_true : forall b c st st',
   beval st' b = true ->
   exists st'', st'' =[ c ]=> st' / SBreak.
 Proof.
-  intros. inversion H. (* parece que há coisas contraditórias... *)
-Qed.
+  intros. induction H.
+Admitted.

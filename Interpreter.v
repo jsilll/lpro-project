@@ -29,7 +29,7 @@ Notation "'LETOPT' x <== e1 'IN' e2"
        end)
    (right associativity, at level 60).
 
-(** 2.1. TODO: Implement ceval_step as specified. To improve readability,
+(** 2.1. DONE: Implement ceval_step as specified. To improve readability,
                you are strongly encouraged to define auxiliary notation.
                See the notation LETOPT commented above (or in the ImpCEval chapter).
 *)
@@ -43,28 +43,25 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
             | <{ x := a1 }> => Some (x !-> (aeval st a1) ; st, SContinue)
 
             (* Seq *)
-            | <{ c1 ; c2 }> => match ceval_step st c1 i' with
-                               | Some (st', r) => match r with
-                                                  | SContinue => ceval_step st' c2 i'
-                                                  | SBreak => Some (st', SBreak)
-                                                  end
-                               | None => None
+            | <{ c1 ; c2 }> => LETOPT x <== ceval_step st c1 i' IN
+                               match x with
+                               | (st', SBreak) => Some (st', SBreak)
+                               | (st', SContinue) => ceval_step st' c2 i'
                                end
             (* If *)
             | <{ if b then c1 else c2 end }> => match beval st b with
                                                 | true => ceval_step st c1 i'
                                                 | false => ceval_step st c2 i'
                                                 end
+
             (* While *)
             | <{ while b do c end }> => match beval st b with
-                                        | true => match ceval_step st c i' with
-                                                  | Some (st', r) => match r with
-                                                                     | SContinue => ceval_step st' <{ while b do c end }> i'
-                                                                     | SBreak => Some (st', SContinue)
-                                                                     end
-                                                  | None => None
-                                                  end
                                         | false => Some (st, SContinue)
+                                        | true => LETOPT x <== ceval_step st c i' IN
+                                                  match x with
+                                                  | (st', SBreak) => Some (st', SContinue)
+                                                  | (st', SContinue) => ceval_step st' <{ while b do c end }> i'
+                                                  end
                                         end
             end
 end.
@@ -100,16 +97,12 @@ Example example_test_ceval2 :
 Proof. reflexivity. Qed.
 
 (** 
-  2.2. TODO: Prove the following three properties.
+  2.2. DONE: Prove the following three properties.
              Add a succint explanation in your own words of why `equivalence1` and `inequivalence1` are valid.
 *)
 Theorem equivalence1: forall st c,
-(exists i0,
-forall i1, i1>=i0 ->
-ceval_step st <{ break; c }> i1
-=
-ceval_step st <{ break; skip }> i1
-).
+  exists i0, forall i1, i1>=i0 ->
+  ceval_step st <{ break; c }> i1 = ceval_step st <{ break; skip }> i1.
 Proof.
   intros. exists 0.
   intros. destruct i1 as [ | i1'].
@@ -119,34 +112,26 @@ Proof.
     * simpl. reflexivity.  
 Qed.
 
-(* TODO *)
 Theorem inequivalence1: forall st c,
-(exists i0,
-forall i1, i1>=i0 ->
-ceval_step st <{ break; c }> i1
-<>
-ceval_step st <{ skip }> i1
-).
+  exists i0, forall i1, i1>=i0 ->
+  ceval_step st <{ break; c }> i1 <> ceval_step st <{ skip }> i1.
 Proof.
   intros. exists 1.
   intros. destruct i1 as [ | i1'].
-  - lia. (* É assim que devo fazer???
-  Aqui a questão é que se i1 >= 1, então i1 != 0, pelo que não seria necessário considerar esse caso. *)
+  - lia. (* DUVIDA: É assim que devo fazer??? Aqui a questão é que se i1 >= 1,
+            então i1 != 0, pelo que não seria necessário considerar esse caso. *)
   - simpl. destruct i1'.
     * simpl. discriminate.
     * simpl. discriminate.
 Qed.
 
+(* Min. gas for terminating each program *)
 Compute ceval_step empty_st p1 6.
 Compute ceval_step empty_st p2 5.
 
-
-(* TODO *) 
 Theorem p1_equivalent_p2: forall st,
-  (exists i0,
-    forall i1, i1>=i0 ->
-      ceval_step st p1 i1 = ceval_step st p2 i1
-  ).
+  exists i0, forall i1, i1>=i0 -> 
+  ceval_step st p1 i1 = ceval_step st p2 i1.
 Proof.
   intros. exists 6.
   intros. destruct i1.
@@ -171,5 +156,3 @@ Proof.
     }
   }
 Qed.
-
-

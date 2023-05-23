@@ -165,7 +165,7 @@ Proof. reflexivity. Qed.
 
 
 (**
-  1.1. TODO: Extend the datatype with the new construct as specified.
+  1.1. DONE: Extend the datatype with the new construct as specified.
 *)
 
 (** Here is the formal definition of the abstract syntax of
@@ -182,11 +182,9 @@ Inductive com : Type :=
 
 
 (**
-  1.2. TODO: Define new notation for the [break] statement.
+  1.2. DONE: Define new notation for the [break] statement.
 *)
 
-
-(* TODO *)
 Notation "'break'" := CBreak (in custom com at level 0).
 Notation "'skip'"  :=
          CSkip (in custom com at level 0) : com_scope.
@@ -206,10 +204,9 @@ Notation "'while' x 'do' y 'end'" :=
             (in custom com at level 89, x at level 99, y at level 99) : com_scope.
 
 (**
-  1.3. TODO: Define the programs p1 and p2 as specified in the project brief.
+  1.3. DONE: Define the programs p1 and p2 as specified in the project brief.
 *)
 
-(* TODO *)
 Definition p1 := <{ X := 1; 
                     Y := 0; 
                     while true do 
