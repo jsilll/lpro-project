@@ -25,7 +25,7 @@ coq_makefile -f _CoqProject -o Makefile
 - [x] Definition of ceval - JS, FA
 - [x] Proof of break_ignore - JS
 - [x] Proof of while_continue - JS
-- [ ] Proof of while_stops_on_break - FA
+- [x] Proof of while_stops_on_break - FA
 - [ ] Proof of seq_continue - FA
 - [x] Proof of seq_stops_on_break - LA
 - [ ] Proof of while_break_true - LA

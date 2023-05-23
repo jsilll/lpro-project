@@ -174,13 +174,18 @@ Proof.
   intros. inversion H; reflexivity. 
 Qed.
 
+(*
+  Explanation: when the first command of the body of a while loop signals SBreak,
+  then the resulting state of the loop is the state that resulted from executing
+  that command, and the loop signals SContinue.
+*)
 Theorem while_stops_on_break : forall b c st st',
   beval st b = true ->
   st =[ c ]=> st' / SBreak ->
   st =[ while b do c end ]=> st' / SContinue.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. apply E_WhileTrueBreak; assumption.
+Qed.
 
 Theorem seq_continue : forall c1 c2 st st' st'',
   st =[ c1 ]=> st' / SContinue ->
