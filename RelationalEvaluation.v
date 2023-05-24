@@ -168,7 +168,7 @@ Theorem break_ignore : forall c st st' s,
      st =[ break; c ]=> st' / s ->
      st = st'.
 Proof.
-  intros. inversion H; subst.
+  intros. inversion H.
   - inversion H5. reflexivity. 
   - inversion H2.
 Qed.

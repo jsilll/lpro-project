@@ -33,19 +33,19 @@ Set Default Goal Selector "!".
   state st' and result res in i + 1 steps.
 *)
 Theorem ceval_step_more: forall i1 i2 st st' res c,
-i1 <= i2 ->
-ceval_step st c i1 = Some (st', res) ->
-ceval_step st c i2 = Some (st', res).
+  i1 <= i2 ->
+  ceval_step st c i1 = Some (st', res) ->
+  ceval_step st c i2 = Some (st', res).
 Proof.
-  induction i1 as [| i1' IH]; intros i2 st st' res c Hle Hceval.
+  induction i1 as [| i1' ]; intros i2 st st' res c Hle Hceval.
   - (* i1 = 0 *)
-    simpl. discriminate.
+    simpl in Hceval. inversion Hceval.
   - (* i1 = S i1' *)
-    destruct i2.
+    destruct i2 as [| i2' ].
     + (* i2 = 0; contradiction *)
       inversion Hle.
     + (* i2 = S i2' *)
-      destruct c; simpl.
+      inversion Hle; subst; destruct c.
       * (* Skip *)
         inversion Hceval; subst. reflexivity.
       * (* Break *)
@@ -53,12 +53,21 @@ Proof.
       * (* Assign *)
         inversion Hceval; subst. reflexivity.
       * (* Sequence *)
-        simpl in Hceval.
-        destruct (ceval_step st c1 i1') eqn:Heqst1res1.
-        ** (* Some (st1, res1) *)
-          (* TODO *)
+        simpl in Hceval. simpl.
+        destruct (ceval_step st c1 i2') eqn:Heqst1'o.
+        ** (* Some p *)
+           admit.
+        ** (* None *)
+           discriminate Hceval.
+      * (* If *)
+      simpl in Hceval. simpl. destruct (beval st b);
+      apply (IHi1' i2') in Hceval.
+        ** assumption.
+        ** lia.
+        ** assumption.
+        ** lia.
+      * (* While *)
 Admitted.
-
 
 (* ################################################################# *)
 (** * Relational vs. Step-Indexed Evaluation *)
