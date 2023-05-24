@@ -152,21 +152,34 @@ Inductive ceval : com -> state -> result -> state -> Prop :=
   where "st '=[' c ']=>' st' '/' s" := (ceval c st s st').
 
 (** 
-  3.2. TODO: Prove the following six properties of your definition of [ceval].
+  3.2. DONE: Prove the following six properties of your definition of [ceval].
              Note that your semantics needs to satisfy these properties: if any of 
              these properties becomes unprovable, you should revise your definition of `ceval`. 
              Add a succint comment before each property explaining the property in your own words.
 *)
 
+(**
+  Explanation:
+  This property states that if a break command is 
+  encountered, no matter what the following program 
+  instructions are, the resulting state remains unchanged.
+*)
 Theorem break_ignore : forall c st st' s,
      st =[ break; c ]=> st' / s ->
      st = st'.
 Proof.
-  intros. inversion H. 
+  intros. inversion H.
   - inversion H5. reflexivity. 
-  - inversion H2. 
+  - inversion H2.
 Qed.
 
+(**
+  Explanation:
+  This property states that the resulting signal of
+  evaluating a while loop is never a break signal.
+  This happens because all break instructions within
+  'c' only break the innermost loop.
+*)
 Theorem while_continue : forall b c st st' s,
   st =[ while b do c end ]=> st' / s ->
   s = SContinue.
