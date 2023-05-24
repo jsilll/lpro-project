@@ -38,8 +38,13 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
   match i with
   | O => None
   | S i' => match c with
+            (* Break *)
             | <{ break }> => Some (st, SBreak)
+            
+            (* Skip *)
             | <{ skip }> => Some (st, SContinue)
+            
+            (* Assign *)
             | <{ x := a1 }> => Some (x !-> (aeval st a1) ; st, SContinue)
 
             (* Seq *)
@@ -53,7 +58,6 @@ Fixpoint ceval_step (st : state) (c : com) (i : nat): option (state*result) :=
                                                 | true => ceval_step st c1 i'
                                                 | false => ceval_step st c2 i'
                                                 end
-
             (* While *)
             | <{ while b do c end }> => match beval st b with
                                         | false => Some (st, SContinue)
@@ -118,14 +122,16 @@ Theorem inequivalence1: forall st c,
 Proof.
   intros. exists 1.
   intros. destruct i1 as [ | i1'].
-  - lia. (* DUVIDA: É assim que devo fazer??? Aqui a questão é que se i1 >= 1,
-            então i1 != 0, pelo que não seria necessário considerar esse caso. *)
+  - lia.
   - simpl. destruct i1'.
     * simpl. discriminate.
     * simpl. discriminate.
 Qed.
 
-(* Min. gas for terminating each program *)
+(**
+  Min. gas for the evaluator 
+  terminating each program
+*)
 Compute ceval_step empty_st p1 6.
 Compute ceval_step empty_st p2 5.
 

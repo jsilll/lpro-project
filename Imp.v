@@ -171,7 +171,6 @@ Proof. reflexivity. Qed.
 (** Here is the formal definition of the abstract syntax of
     commands: *)
 
-
 Inductive com : Type :=
   | CSkip
   | CBreak
@@ -179,7 +178,6 @@ Inductive com : Type :=
   | CSeq (c1 c2 : com)
   | CIf (b : bexp) (c1 c2 : com)
   | CWhile (b : bexp) (c : com).
-
 
 (**
   1.2. DONE: Define new notation for the [break] statement.
