@@ -175,9 +175,10 @@ Proof.
 Qed.
 
 (*
-  Explanation: when the first command of the body of a while loop signals SBreak,
-  then the resulting state of the loop is the state that resulted from executing
-  that command, and the loop signals SContinue.
+  Explanation:
+  This theorem states that when the execution of the body of a
+  while loop signals SBreak, then the resulting state of the loop is the state
+  that resulted from that execution, and the loop signals SContinue.
 *)
 Theorem while_stops_on_break : forall b c st st',
   beval st b = true ->
@@ -187,13 +188,22 @@ Proof.
   intros. apply E_WhileTrueBreak; assumption.
 Qed.
 
+
+(*
+  Explanation:
+  This theorem states that when both commands of a sequence signal SContinue,
+  then the resulting state of the sequence is is the state that resulted
+  from executing both commands, and the signal of the sequence is SContinue.
+  (This is a particular case of the E_SeqContinue rule, in which the 's' variable
+  is instanciated to SContinue)
+*)
 Theorem seq_continue : forall c1 c2 st st' st'',
   st =[ c1 ]=> st' / SContinue ->
   st' =[ c2 ]=> st'' / SContinue ->
   st =[ c1 ; c2 ]=> st'' / SContinue.
 Proof.
-  (* TODO *)
-Admitted.
+  intros. apply E_SeqContinue with (st' := st'); assumption. 
+Qed.
 
 Theorem seq_stops_on_break : forall c1 c2 st st',
   st =[ c1 ]=> st' / SBreak ->
