@@ -93,6 +93,13 @@ Qed.
     amount to the same thing in the end.  This section shows that this
     is the case. *)
 
+(**
+  Explanation:
+  This property states that if the step indexed evaluator executes
+  successfully, then the relation rules also arrive at the same conclusion.
+  This proves one side of double implication need to prove equivalence
+  between both semantics.
+*)
 Theorem ceval_step__ceval: forall c st st' res,
     (exists i, ceval_step st c i = Some (st', res)) ->
     st =[ c ]=> st' / res.
