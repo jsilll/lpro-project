@@ -59,6 +59,7 @@ Proof.
         simpl in Hceval. simpl.
         destruct (ceval_step st c1 i1') eqn:Heqst1'o.
         -- (* Some TODO *)
+          admit.
           (* apply (IHi1' i2' st st' res c1) in Heqst1'o; try assumption.
           rewrite Heqst1'o. simpl. simpl in Hceval. *)
         -- (* None *)
@@ -139,14 +140,14 @@ Admitted.
   Explanation:
   This theorem states that the evaluation relation is deterministic.
   The proof applies the `ceval__ceval_step` theorem to both hypotheses.
-  This theorem relates the step indexed evaluator with the relations.
+  This theorem relates the step indexed evaluator with the relation rules.
   Then, using using the inversion tactic, we can extract equalities
-  that relate the step indexed evaluator with the relations.
-  Finally, using the `ceval_step_more` theorem, we can state that the
-  result of both evaluations should be the same for a higher number of
-  maximum steps allowed. By applying the `ceval_step_more` theorem twice,
-  with i2 := i1 + i2, we can state that the result of both evaluations
-  is the same.
+  that directly relate the step indexed evaluator with the result of the evaluation.
+  Finally, using the `ceval_step_more` theorem, we are able to state that the
+  result of both evaluations should remain the same when a higher number of
+  maximum steps is allowed. By applying the `ceval_step_more` to both equalities,
+  with i2 := i1 + i2, we reach the conclusion that the results of both evaluations
+  should be the same, by simple algebraic manipulations.
 *)
 Theorem ceval_deterministic' : forall c st st1 st2 res1 res2,
    st =[ c ]=> st1 / res1 ->
