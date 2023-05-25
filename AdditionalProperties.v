@@ -89,11 +89,43 @@ Proof.
   generalize dependent st.
   generalize dependent c.
   induction i as [| i' ].
-    - intros. inversion E.
-    - intros.  
-(* TODO *)
-
-Admitted.
+    - intros c st st' res H. discriminate.
+    - intros c st st' res H. destruct c; simpl in H; inversion H; subst; clear H.
+      -- apply E_Skip.
+      -- apply E_Break.
+      -- apply E_Asgn. reflexivity.
+      -- destruct (ceval_step st c1 i') eqn:Heqr1.
+        + destruct p.
+          ++ destruct r.
+            +++ apply E_SeqContinue with (s).
+              * apply IHi'. rewrite Heqr1. reflexivity.
+              * apply IHi'. rewrite H1. reflexivity.
+            +++ inversion H1. apply E_SeqBreak. apply IHi'. rewrite Heqr1. rewrite H0. reflexivity.
+        + discriminate.
+      -- destruct (beval st b) eqn:Heqr.
+        + apply E_IfTrue.
+          ++ assumption.
+          ++ apply IHi'. rewrite H1. reflexivity.
+        + apply E_IfFalse.
+          ++ assumption.
+          ++ apply IHi'. rewrite H1. reflexivity.
+      -- destruct (beval st b) eqn :Heqr.
+        + destruct (ceval_step st c i') eqn:Heqr1.
+          ++ destruct res.
+            +++ destruct p. destruct r.
+                * apply E_WhileTrueContinue with (s).
+                  ** assumption.
+                  ** apply IHi'. rewrite Heqr1. reflexivity.
+                  ** apply IHi'. assumption. 
+                * apply E_WhileTrueBreak.
+                  ** assumption.
+                  ** apply IHi'. rewrite Heqr1. inversion H1. reflexivity.
+            +++ destruct p. destruct r.
+              * apply IHi' in H1. apply IHi' in Heqr1. inversion H1.
+              * discriminate.
+          ++ discriminate. 
+        + inversion H1. apply E_WhileFalse. rewrite <- H0. assumption.
+Qed.
 
 (** 
   TODO: For the following proof, you'll need [ceval_step_more] in a
