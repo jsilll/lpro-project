@@ -158,8 +158,42 @@ Theorem ceval__ceval_step: forall c st st' res,
     st =[ c ]=> st' / res ->
     exists i, ceval_step st c i = Some (st', res).
 Proof.
-  (* TODO *)
-Admitted. 
+  intros. induction H.
+  
+  - exists 1. simpl. reflexivity.
+  
+  - exists 1. simpl. reflexivity.
+  
+  - exists 1. simpl. rewrite H. reflexivity.
+  
+  - inversion IHceval as [i E]. exists (S i). simpl. rewrite E. reflexivity.
+  
+  - inversion IHceval1 as [i1 E1]. inversion IHceval2 as [i2 E2]. exists (S (max i1 i2)). simpl.
+    rewrite (ceval_step_more i1 (max i1 i2) st st' SContinue c1).
+    + rewrite (ceval_step_more i2 (max i1 i2) st' st'' s c2).
+      * reflexivity.
+      * lia.
+      * assumption. 
+    + lia.
+    + assumption.
+  
+  - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. assumption.
+
+  - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. assumption.
+  
+  - exists 1. simpl. rewrite H. reflexivity. 
+  
+  - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. rewrite E. reflexivity.
+  
+  - inversion IHceval1 as [i1 E1]. inversion IHceval2 as [i2 E2]. exists (S (max i1 i2)). simpl.
+  rewrite (ceval_step_more i1 (max i1 i2) st st' SContinue c).
+  + rewrite H. rewrite (ceval_step_more i2 (max i1 i2) st' st'' SContinue (<{while b do c end}>)).
+    * reflexivity.
+    * lia.
+    * assumption.
+  + lia.
+  + assumption. 
+Qed. 
 
 (* Note that with the above properties, we can say that both semantics are equivalent! *)
 

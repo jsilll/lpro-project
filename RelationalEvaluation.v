@@ -230,5 +230,8 @@ Theorem while_break_true : forall b c st st',
   beval st' b = true ->
   exists st'', st'' =[ c ]=> st' / SBreak.
 Proof.
-  intros. induction H.
-Admitted.
+  intros. remember (<{while b do c end}>) as loop. induction H; inversion Heqloop; subst.
+  - rewrite H in H0. discriminate.
+  - exists st. assumption.
+  - apply IHceval2; assumption.
+Qed.
