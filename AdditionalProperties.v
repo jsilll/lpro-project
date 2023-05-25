@@ -58,10 +58,13 @@ Proof.
       * (* ; *)
         simpl in Hceval. simpl.
         destruct (ceval_step st c1 i1') eqn:Heqst1'o.
-        -- (* Some TODO *)
-          admit.
-          (* apply (IHi1' i2' st st' res c1) in Heqst1'o; try assumption.
-          rewrite Heqst1'o. simpl. simpl in Hceval. *)
+        -- (* Some *)
+          destruct p. apply (IHi1' i2') in Heqst1'o; try assumption.
+          rewrite Heqst1'o. destruct r.
+          ++ (* SContinue *)
+            apply (IHi1' i2') in Hceval; assumption.
+          ++ (* SBreak *)
+            assumption.
         -- (* None *)
           discriminate Hceval.
       * (* if *)
@@ -71,11 +74,16 @@ Proof.
         simpl in Hceval. simpl.
         destruct (beval st b); try assumption.
         destruct (ceval_step st c i1') eqn:Heqst1'o.
-        -- (* Some TODO *)
-          admit.
+        -- (* Some *)
+          destruct p. apply (IHi1' i2') in Heqst1'o; try assumption.
+          rewrite -> Heqst1'o. destruct r.
+          ++ (* SContinue *)
+            apply (IHi1' i2') in Hceval; assumption.
+          ++ (* SBreak *)
+            assumption.
         -- (* None *)
           discriminate Hceval.
-Admitted.
+Qed.
 
 (* ################################################################# *)
 (** * Relational vs. Step-Indexed Evaluation *)
