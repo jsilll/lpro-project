@@ -27,10 +27,12 @@ Set Default Goal Selector "!".
 (** * Property of the Step-Indexed Interpreter *)
 
 (**
-  This property states that if a given program
-  evaluates to a state st' and a result res in
-  i max steps, then it also evaluates to the same
-  state st' and result res in i + 1 steps.
+  Explanation:
+  This property states that if the evaluator is allowed i1
+  more steps and after executing the command `c` coming from
+  state `st` results in `(st', res)` then if the evaluator 
+  is allowed i2 steps, provided that i2 >= i1, then the result
+  has to be the same.
 *)
 Theorem ceval_step_more: forall i1 i2 st st' res c,
   i1 <= i2 ->
@@ -40,33 +42,38 @@ Proof.
   induction i1 as [| i1' ]; intros i2 st st' res c Hle Hceval.
   - (* i1 = 0 *)
     simpl in Hceval. inversion Hceval.
-  - (* i1 = S i1' *)
-    destruct i2 as [| i2' ].
-    + (* i2 = 0; contradiction *)
-      inversion Hle.
+  - (* i1 = S i1' *) 
+    destruct i2 as [| i2']; inversion Hle; subst.
+    + (* i2 = 0 *)
+      rewrite Hceval. reflexivity.
     + (* i2 = S i2' *)
-      inversion Hle; subst; destruct c.
+    assert (Hle': i1' <= i2') by lia.
+    destruct c.
       * (* Skip *)
-        inversion Hceval; subst. reflexivity.
+        inversion Hceval. simpl. reflexivity.
       * (* Break *)
-        inversion Hceval; subst. reflexivity.
-      * (* Assign *)
-        inversion Hceval; subst. reflexivity.
-      * (* Sequence *)
+        inversion Hceval. simpl. reflexivity.
+      * (* := *)
+        inversion Hceval. simpl. reflexivity.
+      * (* ; *)
         simpl in Hceval. simpl.
-        destruct (ceval_step st c1 i2') eqn:Heqst1'o.
-        ** (* Some p *)
-           admit.
-        ** (* None *)
-           discriminate Hceval.
-      * (* If *)
-      simpl in Hceval. simpl. destruct (beval st b);
-      apply (IHi1' i2') in Hceval.
-        ** assumption.
-        ** lia.
-        ** assumption.
-        ** lia.
-      * (* While *)
+        destruct (ceval_step st c1 i1') eqn:Heqst1'o.
+        -- (* Some TODO *)
+          (* apply (IHi1' i2' st st' res c1) in Heqst1'o; try assumption.
+          rewrite Heqst1'o. simpl. simpl in Hceval. *)
+        -- (* None *)
+          discriminate Hceval.
+      * (* if *)
+        simpl in Hceval. simpl.
+        destruct (beval st b); apply IHi1'; assumption.
+      * (* while *)
+        simpl in Hceval. simpl.
+        destruct (beval st b); try assumption.
+        destruct (ceval_step st c i1') eqn:Heqst1'o.
+        -- (* Some TODO *)
+          admit.
+        -- (* None *)
+          discriminate Hceval.
 Admitted.
 
 (* ################################################################# *)
@@ -92,7 +99,6 @@ Proof.
     - intros. inversion E.
     - intros.  
 (* TODO *)
-
 Admitted.
 
 (** 
@@ -105,8 +111,6 @@ Theorem ceval__ceval_step: forall c st st' res,
 Proof.
   (* TODO *)
 Admitted. 
-
-
 
 (* Note that with the above properties, we can say that both semantics are equivalent! *)
 
@@ -128,17 +132,22 @@ Admitted.
   evaluation are the same, we can give a short proof that the
   evaluation _relation_ is deterministic. *)
 
-(* TODO: Write/explain the following proof in natural language, 
+(* DONE: Write/explain the following proof in natural language, 
          using your own words. *)  
 
 (**
+  Explanation:
   This theorem states that the evaluation relation is deterministic.
-  To prove this, we need to show that the step-indexed evaluations
-  st1 and st2 are the same.
-
-  
+  The proof applies the `ceval__ceval_step` theorem to both hypotheses.
+  This theorem relates the step indexed evaluator with the relations.
+  Then, using using the inversion tactic, we can extract equalities
+  that relate the step indexed evaluator with the relations.
+  Finally, using the `ceval_step_more` theorem, we can state that the
+  result of both evaluations should be the same for a higher number of
+  maximum steps allowed. By applying the `ceval_step_more` theorem twice,
+  with i2 := i1 + i2, we can state that the result of both evaluations
+  is the same.
 *)
-
 Theorem ceval_deterministic' : forall c st st1 st2 res1 res2,
    st =[ c ]=> st1 / res1 ->
    st =[ c ]=> st2 / res2 ->
@@ -154,4 +163,4 @@ Proof.
     -- rewrite E1 in E2. inversion E2. reflexivity.
     -- lia. 
    - lia.  
-Admitted.
+Qed.
