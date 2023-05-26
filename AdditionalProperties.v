@@ -19,7 +19,7 @@ Set Default Goal Selector "!".
 
 
 (**
-  3.2. TODO: Prove all the properties below that are stated without proof.
+  3.2. DONE: Prove all the properties below that are stated without proof.
              Add a succint comment before each property explaining the property in your own words.
 *)
 
@@ -28,11 +28,9 @@ Set Default Goal Selector "!".
 
 (**
   Explanation:
-  This property states that if the evaluator is allowed i1
-  more steps and after executing the command `c` coming from
-  state `st` results in `(st', res)` then if the evaluator 
-  is allowed i2 steps, provided that i2 >= i1, then the result
-  has to be the same.
+  This property states that if the step indexed evaluator
+  produces a successful output with some number of gas units,
+  then if given more gas units it must reach the same output.
 *)
 Theorem ceval_step_more: forall i1 i2 st st' res c,
   i1 <= i2 ->
@@ -151,7 +149,7 @@ Proof.
 Qed.
 
 (** 
-  TODO: For the following proof, you'll need [ceval_step_more] in a
+  DONE: For the following proof, you'll need [ceval_step_more] in a
   few places, as well as some basic facts about [<=] and [plus]. *)
 
 (*
@@ -225,7 +223,7 @@ intros c st st'.
 split. 
  - apply ceval__ceval_step. 
  - apply ceval_step__ceval.
-Admitted.
+Qed.
 
 
 (* ################################################################# *)
@@ -241,15 +239,17 @@ Admitted.
 (**
   Explanation:
   This theorem states that the evaluation relation is deterministic.
-  The proof applies the `ceval__ceval_step` theorem to both hypotheses.
-  This theorem relates the step indexed evaluator with the relation rules.
-  Then, using using the inversion tactic, we can extract equalities
-  that directly relate the step indexed evaluator with the result of the evaluation.
-  Finally, using the `ceval_step_more` theorem, we are able to state that the
-  result of both evaluations should remain the same when a higher number of
-  maximum steps is allowed. By applying the `ceval_step_more` to both equalities,
-  with i2 := i1 + i2, we reach the conclusion that the results of both evaluations
-  should be the same, by simple algebraic manipulations.
+  
+  Let st and c be some state and program, respectively. Then using the
+  `ceval__ceval_step` theorem in both hypothesis we can conclude
+  that for each one of them there exists some number i of gas units such that
+  the step indexed evaluator executes successfully with st and c as inputs.
+
+  Let i1 and i2 be such numbers. Then, using the `ceval_step_more` theorem,
+  we are able to state that the result of both evaluations should remain the same
+  when using i1 + i2 as the number of gas units. Since we have two equalities with the
+  same left hand side we are able to conclude that their right hand side must be equal,
+  that is 'Some (st1, res1) = Some (st2, res2)', which implies 'st1 = st2'. Qed.
 *)
 Theorem ceval_deterministic' : forall c st st1 st2 res1 res2,
    st =[ c ]=> st1 / res1 ->

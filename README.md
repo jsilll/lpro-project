@@ -34,4 +34,4 @@ coq_makefile -f _CoqProject -o Makefile
 - [x] Proof of ceval_step_more - JS
 - [x] Proof of ceval_step__ceval - FA
 - [x] Proof of ceval__ceval_step - LA
-- [x] Informal proof of ceval_deterministic' - JS
+- [x] Informal proof of ceval_deterministic' - JS, FA, LA

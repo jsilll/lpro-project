@@ -234,7 +234,7 @@ Qed.
 (*
 Explanation:
 This theorem states that when the execution of a loop stops in a state that still satisfies its
-condition, then there must exist some break command inside its body.
+condition, then there must exist some reachable break command that breaks said loop.
 *)
 Theorem while_break_true : forall b c st st',
   st =[ while b do c end ]=> st' / SContinue ->
