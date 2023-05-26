@@ -28,13 +28,10 @@ coq_makefile -f _CoqProject -o Makefile
 - [x] Proof of while_stops_on_break - FA
 - [x] Proof of seq_continue - FA
 - [x] Proof of seq_stops_on_break - LA
-- [ ] Proof of while_break_true - LA
+- [x] Proof of while_break_true - LA
 
 ### Task 3 (AdditionalProperties.v)
-- [ ] Proof of ceval_step_more - JS
+- [x] Proof of ceval_step_more - JS
 - [x] Proof of ceval_step__ceval - FA
-- [ ] Proof of ceval__ceval_step - LA
-- [ ] Informal proof of ceval_deterministic' - JS
-
-# Extras
-Identify and describe additional work that you have done, so that it can be considered for extra credits.
+- [x] Proof of ceval__ceval_step - LA
+- [x] Informal proof of ceval_deterministic' - JS
