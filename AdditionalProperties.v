@@ -97,7 +97,7 @@ Qed.
   Explanation:
   This property states that if the step indexed evaluator executes
   successfully, then the relation rules also arrive at the same conclusion.
-  This proves one side of double implication need to prove equivalence
+  This proves one side of the double implication needed to prove equivalence
   between both semantics.
 *)
 Theorem ceval_step__ceval: forall c st st' res,
@@ -154,45 +154,65 @@ Qed.
   TODO: For the following proof, you'll need [ceval_step_more] in a
   few places, as well as some basic facts about [<=] and [plus]. *)
 
+(*
+  Explanation:
+  This property states that if the relation rules arrive at some conclusion, then, 
+  for some gas value, the step indexed evaluator executes successfully and reaches a
+  matching output.
+  This proves the other side of the double implication needed to prove equivalence
+  between both semantics. 
+*)
 Theorem ceval__ceval_step: forall c st st' res,
     st =[ c ]=> st' / res ->
     exists i, ceval_step st c i = Some (st', res).
 Proof.
   intros. induction H.
   
+  (* H comes from E_Break *)
   - exists 1. simpl. reflexivity.
   
+  (* H comes from E_Skip *)
   - exists 1. simpl. reflexivity.
   
+  (* H comes from E_Asgn *)
   - exists 1. simpl. rewrite H. reflexivity.
   
+  (* H comes from E_SeqBreak *)
   - inversion IHceval as [i E]. exists (S i). simpl. rewrite E. reflexivity.
   
-  - inversion IHceval1 as [i1 E1]. inversion IHceval2 as [i2 E2]. exists (S (max i1 i2)). simpl.
-    rewrite (ceval_step_more i1 (max i1 i2) st st' SContinue c1).
-    + rewrite (ceval_step_more i2 (max i1 i2) st' st'' s c2).
-      * reflexivity.
+  (* H comes from E_SeqContinue *)
+  - inversion IHceval1 as [i1 E1].
+    inversion IHceval2 as [i2 E2].
+    exists (S (max i1 i2)). simpl.
+    apply ceval_step_more with (i2 := max i1 i2) in E1.
+    + apply ceval_step_more with (i2 := max i1 i2) in E2.
+      (* 'assumption.' instead of 'rewrite E2. reflexivity.' would also work *)
+      * rewrite E1. rewrite E2. reflexivity. 
       * lia.
-      * assumption. 
     + lia.
-    + assumption.
   
+  (* H comes from E_IfTrue *)
   - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. assumption.
 
+  (* H comes from E_IfFalse *)
   - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. assumption.
   
+  (* H comes from E_WhileFalse *)
   - exists 1. simpl. rewrite H. reflexivity. 
   
+  (* H comes from E_WhileTrueBreak *)
   - inversion IHceval as [i E]. exists (S i). simpl. rewrite H. rewrite E. reflexivity.
   
-  - inversion IHceval1 as [i1 E1]. inversion IHceval2 as [i2 E2]. exists (S (max i1 i2)). simpl.
-  rewrite (ceval_step_more i1 (max i1 i2) st st' SContinue c).
-  + rewrite H. rewrite (ceval_step_more i2 (max i1 i2) st' st'' SContinue (<{while b do c end}>)).
-    * reflexivity.
-    * lia.
-    * assumption.
-  + lia.
-  + assumption. 
+  (* H comes from E_WhileTrueContinue *)
+  - inversion IHceval1 as [i1 E1].
+    inversion IHceval2 as [i2 E2].
+    exists (S (max i1 i2)). simpl.
+    apply ceval_step_more with (i2 := max i1 i2) in E1.
+    + rewrite H. apply ceval_step_more with (i2 := max i1 i2) in E2.
+      (* 'assumption.' instead of 'rewrite E2. reflexivity.' would also work *)
+      * rewrite E1. rewrite E2. reflexivity.
+      * lia.
+    + lia.
 Qed. 
 
 (* Note that with the above properties, we can say that both semantics are equivalent! *)

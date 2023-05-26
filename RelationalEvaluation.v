@@ -218,6 +218,12 @@ Proof.
   intros. apply E_SeqContinue with (st' := st'); assumption. 
 Qed.
 
+
+(*
+  Explanation: 
+  This theorem states that when the execution of a command c1 signals SBreak, then a sequential
+  composition starting with c1 produces the same state and it also signals SBreak.
+*)
 Theorem seq_stops_on_break : forall c1 c2 st st',
   st =[ c1 ]=> st' / SBreak ->
   st =[ c1 ; c2 ]=> st' / SBreak.
@@ -225,13 +231,24 @@ Proof.
   intros. apply E_SeqBreak. assumption. 
 Qed.
 
+(*
+Explanation:
+This theorem states that when the execution of a loop stops in a state that still satisfies its
+condition, then there must exist some break command inside its body.
+*)
 Theorem while_break_true : forall b c st st',
   st =[ while b do c end ]=> st' / SContinue ->
   beval st' b = true ->
   exists st'', st'' =[ c ]=> st' / SBreak.
 Proof.
   intros. remember (<{while b do c end}>) as loop. induction H; inversion Heqloop; subst.
+  
+  (* H comes from E_WhileFalse (contradiction) *)
   - rewrite H in H0. discriminate.
+  
+  (* H comes from E_WhileTrueBreak *)
   - exists st. assumption.
+
+  (* H comes from E_WhileTrueContinue *)
   - apply IHceval2; assumption.
 Qed.

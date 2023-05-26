@@ -104,6 +104,15 @@ Proof. reflexivity. Qed.
   2.2. DONE: Prove the following three properties.
              Add a succint explanation in your own words of why `equivalence1` and `inequivalence1` are valid.
 *)
+
+(*
+  Explanation: 
+  This theorem states that there exists a point (i0) from which (i1 >= i0) evaluating the programs
+  <{ break; c }> and <{ break; skip }> with i1 gas units produces the same output.
+  This is true; in fact, it is true for all natural i1, so we can take i0 = 0. 
+  It is true for i1 = 0 because both of them output None; furthermore, it is also true for i1 >=1 because both
+  of them start with a break command, meaning that the state st will not be changed and the signal wil be SBreak.
+*)
 Theorem equivalence1: forall st c,
   exists i0, forall i1, i1>=i0 ->
   ceval_step st <{ break; c }> i1 = ceval_step st <{ break; skip }> i1.
@@ -116,6 +125,14 @@ Proof.
     * simpl. reflexivity.  
 Qed.
 
+(*
+  Explanation: 
+  This theorem states that there exists a point (i0) from which (i1 >= i0) evaluating the programs
+  <{ break; c }> and <{ skip }> with i1 gas units produces different outputs.
+  This is true because, although both of them keep the state st, they produce different signals (SBreak and
+  SContinue). However, this only happens for i1 >= 1, because for i1 = 0 they will both output None.
+  Thus, we can take i0 = 1 and it will be true.
+*)
 Theorem inequivalence1: forall st c,
   exists i0, forall i1, i1>=i0 ->
   ceval_step st <{ break; c }> i1 <> ceval_step st <{ skip }> i1.
