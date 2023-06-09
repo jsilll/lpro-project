@@ -1,0 +1,13 @@
+*.d
+*.vo
+*.vok
+*.vos
+*.aux
+*.glob
+*.conf
+*.cache
+
+P1/Makefile
+P2/Makefile
+P1/.coq-native/
+P2/.coq-native/
