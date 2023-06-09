@@ -7,7 +7,5 @@
 *.conf
 *.cache
 
-P1/Makefile
-P2/Makefile
-P1/.coq-native/
-P2/.coq-native/
+Makefile
+.coq-native/
