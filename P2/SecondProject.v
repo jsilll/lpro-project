@@ -74,9 +74,9 @@ Inductive com : Type :=
   | CSeq (c1 c2 : com)
   | CIf (b : bexp) (c1 c2 : com)
   | CWhile (b : bexp) (c : com)
-  | CAssert (b : bexp)  (* <- new *)
-  | CAssume (b : bexp)  (* <- new *)
-  | CNonDetChoice (c1 c2: com).  (* <- new *)
+  | CAssert (b : bexp)          (* <- new *)
+  | CAssume (b : bexp)          (* <- new *)
+  | CNonDetChoice (c1 c2: com). (* <- new *)
 
 (* We now define notations. *)  
 Notation "'skip'"  :=
@@ -163,7 +163,21 @@ Inductive ceval : com -> state -> result -> Prop :=
       beval st b = true ->
       st =[ c ]=> RError ->
       st =[ while b do c end ]=> RError
-  (* TODO *)
+  | E_AssertTrue : forall st b,
+      beval st b = true ->
+      st =[ assert b ]=> RNormal st
+  | E_AssertFalse : forall st b,
+      beval st b = false ->
+      st =[ assert b ]=> RError
+  | E_AssumeTrue : forall st b,
+      beval st b = true ->
+      st =[ assume b ]=> RNormal st
+  | E_NoneDetChoice1 : forall st c1 c2 r,
+      st =[ c1 ]=> r ->
+      st =[ c1 !! c2 ]=> r
+  | E_NoneDetChoice2 : forall st c1 c2 r,
+      st =[ c2 ]=> r ->
+      st =[ c1 !! c2 ]=> r
 
 where "st '=[' c ']=>' r" := (ceval c st r).
 
@@ -199,14 +213,21 @@ Theorem assume_false: forall P Q b,
        (forall st, beval st b = false) ->
        ({{P}} assume b {{Q}}).
 Proof.
-  (* TODO *)
+  unfold hoare_triple. intros.
+  inversion H0. subst. 
+  rewrite H in H3.
+  inversion H3.
 Qed.
 
 Theorem assert_implies_assume : forall P b Q,
      ({{P}} assert b {{Q}})
   -> ({{P}} assume b {{Q}}).
 Proof.
-  (* TODO *)
+  unfold hoare_triple. intros.
+  inversion H0; subst.
+  specialize (H st (RNormal st)).
+  apply H; try assumption.
+  - apply E_AssertTrue. assumption.
 Qed.
 
 

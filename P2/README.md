@@ -1,3 +1,14 @@
+# Project Setup 
+
+Generating the Makefile:
+```
+coq_makefile -f _CoqProject -o Makefile
+```
+# Group Identification
+- Lourenço Abecasis, [Email](lourenco.abecasis@tecnico.ulisboa.pt), 93931
+- Francisco Abrunhosa, [Email](francisco.abrunhosa@tecnico.ulisboa.pt), 95580
+- João Silveira, [Email](joao.freixial.silveira@tecnico.ulisboa.pt), 95597
+
 ### João 
 1. Big Step semantics, 1 points
 2. Properties assert, assume, 2 points
