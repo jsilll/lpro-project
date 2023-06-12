@@ -368,9 +368,15 @@ Qed.
 (* ================================================================= *)
 
 Theorem hoare_assert: forall P (b: bexp),
-  (*TODO: Hoare proof rule for [assert b] *)
+  P ->> b ->
+  {{P}} assert b {{P}}.
 Proof.
-  (* TODO *)
+  unfold hoare_triple, "->>". intros.
+  inversion H0; subst.
+  - exists st. split.
+    + reflexivity.
+    + assumption.   
+  - apply H in H1. rewrite H1 in H3. discriminate.
 Qed.
 
 (* ================================================================= *)
@@ -378,9 +384,13 @@ Qed.
 (* ================================================================= *)
 
 Theorem hoare_assume: forall (P:Assertion) (b:bexp),
-  (*TODO: Hoare proof rule for [assume b] *)
+  {{P}} assume b {{P}}.
 Proof.
-  (* TODO *)
+  unfold hoare_triple. intros.
+  inversion H. subst.
+  exists st. split.
+  - reflexivity.
+  - assumption.
 Qed.
 
 
