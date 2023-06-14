@@ -454,11 +454,28 @@ Inductive cstep : (com * result)  -> (com * result) -> Prop :=
   | CS_IfFalse : forall st c1 c2,
       <{ if false then c1 else c2 end }> / st --> c2 / st
   | CS_While : forall st b c1,
-          <{while b do c1 end}> / st 
+      <{while b do c1 end}> / st 
       --> <{ if b then (c1; while b do c1 end) else skip end }> / st
-
-  (* TODO *)
-  
+  | CS_Par1 : forall st c1 c1' c2 st',
+      c1 / st --> c1' / st' ->
+      <{ c1 !! c2 }> / st --> <{ c1' !! c2 }> / st'
+  | CS_Par2 : forall st c1 c2 c2' st',
+      c2 / st --> c2' / st' ->
+      <{ c1 !! c2 }> / st --> <{ c1 !! c2' }> / st'
+  | CS_ParDone : forall st,
+      <{ skip !! skip }> / st --> <{ skip }> / st
+  | CS_AssertStep : forall st b b',
+      b / st -->b b' ->
+      <{ assert b }> / RNormal st --> <{ assert b' }> / RNormal st
+  | CS_AssertTrue : forall st,
+      <{ assert true }> / RNormal st --> <{ skip }> / RNormal st
+  | CS_AssertFalse : forall st,
+      <{ assert false }> / RNormal st --> <{ skip }> / RError
+  | CS_AssumeStep : forall st b b',
+      b / st -->b b' ->
+      <{ assume b }> / RNormal st --> <{ assume b' }> / RNormal st
+  | CS_AssumeTrue : forall st,
+      <{ assume true }> / RNormal st --> <{ skip }> / RNormal st
 
   where " t '/' st '-->' t' '/' st' " := (cstep (t,st) (t',st')).
 
