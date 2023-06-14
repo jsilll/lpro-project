@@ -658,9 +658,12 @@ Inductive dcom : Type :=
   (* ->> {{ P }} d *)
 | DCPost (d : dcom) (Q : Assertion)
   (* d ->> {{ Q }} *)
-| DCAssert (* TODO *) 
-| DCAssume (* TODO *)
-| DCNonDetChoice (* TODO *)
+| DCAssert (b : bexp) (Q : Assertion)
+  (* assert b {{ Q }} *)
+| DCAssume (b : bexp) (Q : Assertion)
+  (* assume b {{ Q }} *)
+| DCNonDetChoice (d1 d2 : dcom).
+  (* d1 !! d2 *)
 
 (** To provide the initial precondition that goes at the very top of a
     decorated program, we introduce a new type [decorated]: *)
@@ -702,8 +705,20 @@ Notation "{{ P }} d"
       := (Decorated P d)
       (in custom com at level 91, P constr) : dcom_scope.
 
+(* TODO: Notation for the three new constructs *)
 
-(* TODO: notation for the three new constructs *)
+Notation "'assert' l {{ P }}"
+  := (DCAssert l P)
+  (in custom com at level 8,
+   l custom com at level 0, P constr at level 0) : dcom_scope.
+Notation "'assume' l {{ P }}" 
+  := (DCAssume l P)
+  (in custom com at level 8, 
+   l custom com at level 0, P constr at level 0) : dcom_scope.
+Notation " c1 !! c2 " :=
+  (CNonDetChoice c1 c2)
+    (in custom com at level 90, 
+     right associativity) : dcom_scope.
 
 Local Open Scope dcom_scope.
 
@@ -740,7 +755,9 @@ Fixpoint extract (d : dcom) : com :=
   | DCWhile b _ d _    => CWhile b (extract d)
   | DCPre _ d          => extract d
   | DCPost d _         => extract d
-  (* TODO *)
+  | DCAssert b _       => CAssert b
+  | DCAssume b _       => CAssume b
+  | DCNonDetChoice d1 d2 => CNonDetChoice (extract d1) (extract d2)
   end.
 
 Definition extract_dec (dec : decorated) : com :=
@@ -773,7 +790,9 @@ Fixpoint post (d : dcom) : Assertion :=
   | DCWhile _ _ _ Q         => Q
   | DCPre _ d               => post d
   | DCPost _ Q              => Q
-  (* TODO *)
+  | DCAssert _ Q            => Q
+  | DCAssume _ Q            => Q
+  | DCNonDetChoice d1 d2    => post d1 \/ post d2
   end.
 
 Definition post_dec (dec : decorated) : Assertion :=
@@ -941,7 +960,12 @@ Fixpoint verification_conditions (P : Assertion) (d : dcom) : Prop :=
   | DCPost d Q =>
       verification_conditions P d
       /\ (post d ->> Q)
-  (* TODO *)
+  | DCAssert b Q =>
+      ((P /\ b) ->> Q)%assertion
+  | DCAssume b Q =>
+      ((P /\ b) ->> Q)%assertion
+  | DCNonDetChoice d1 d2 =>
+    verification_conditions P d1 \/ verification_conditions P d2
   end.
 
 (** The key theorem states that [verification_conditions] does its job
@@ -988,7 +1012,7 @@ Proof.
   - (* Post *)
     destruct H as [Hd HQ].
     eapply hoare_consequence_post; eauto.
-  (* TODO *)
+    (* TODO *)
 Qed.
 
 
