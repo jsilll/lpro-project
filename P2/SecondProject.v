@@ -367,7 +367,7 @@ Qed.
 (* EXERCISE 3.1: State and prove [hoare_assert]                      *)
 (* ================================================================= *)
 
-Theorem hoare_assert: forall P (b: bexp),
+Theorem hoare_assertERRADO: forall P (b: bexp),
   P ->> b ->
   {{P}} assert b {{P}}.
 Proof.
@@ -379,11 +379,22 @@ Proof.
   - apply H in H1. rewrite H1 in H3. discriminate.
 Qed.
 
+Theorem hoare_assert: forall P (b: bexp),
+  {{b /\ P}} assert b {{P}}.
+Proof.
+  unfold hoare_triple. intros.
+  inversion H; subst.
+  - exists st. split.
+    + reflexivity.
+    + apply H0.   
+  - destruct H0 as (Hb & HP). rewrite Hb in H2. discriminate.
+Qed.
+
 (* ================================================================= *)
 (* EXERCISE 3.2: State and prove [hoare_assume]                      *)
 (* ================================================================= *)
 
-Theorem hoare_assume: forall (P:Assertion) (b:bexp),
+Theorem hoare_assumeERRADO: forall (P:Assertion) (b:bexp),
   {{P}} assume b {{P}}.
 Proof.
   unfold hoare_triple. intros.
@@ -393,15 +404,41 @@ Proof.
   - assumption.
 Qed.
 
+Theorem hoare_assumeIDK: forall (P:Assertion) (b:bexp),
+  {{b ->> P}} assume b {{P}}.
+Proof.
+  unfold hoare_triple, "->>". intros.
+  inversion H. subst.
+  exists st. split.
+  - reflexivity.
+  - apply H0 in H2. assumption.
+Qed.
+
+Theorem hoare_assume: forall (P:Assertion) (b:bexp),
+  {{P}} assume b {{P /\ b}}.
+Proof.
+  unfold hoare_triple. intros.
+  inversion H. subst.
+  exists st. split.
+  - reflexivity.
+  - split; assumption.
+Qed.
+
 
 (* ================================================================= *)
 (* EXERCISE 3.3: State and prove [hoare_choice]                      *)
 (* ================================================================= *)
 
 Theorem hoare_choice' : forall P c1 c2 Q,
-  (*TODO: Hoare proof rule for [c1 !! c2] *)
+  {{P}} c1 {{Q}} ->
+  {{P}} c2 {{Q}} ->
+  {{P}} c1 !! c2 {{Q}}.
 Proof.
-  (* TODO *)
+  unfold hoare_triple.
+  intros P c1 c2 Q Hc1 Hc2 st r Hchoice HP.
+  inversion Hchoice. subst.
+  - apply Hc1 in H3; assumption.
+  - apply Hc2 in H3; assumption.
 Qed.
 
 
@@ -417,7 +454,12 @@ Example assert_assume_example:
   X := X + 1
   {{ X = 42 }}.  
 Proof.
-  (* TODO *)
+  eapply hoare_seq.
+  apply hoare_asgn.
+  eapply hoare_consequence_post.
+  apply hoare_assume.
+  unfold "->>". simpl. intros.
+  destruct H as (HX1 & HX2). rewrite HX1 in HX2. discriminate. 
 Qed.
 
 
