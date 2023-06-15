@@ -367,20 +367,8 @@ Qed.
 (* EXERCISE 3.1: State and prove [hoare_assert]                      *)
 (* ================================================================= *)
 
-Theorem hoare_assertERRADO: forall P (b: bexp),
-  P ->> b ->
-  {{P}} assert b {{P}}.
-Proof.
-  unfold hoare_triple, "->>". intros.
-  inversion H0; subst.
-  - exists st. split.
-    + reflexivity.
-    + assumption.   
-  - apply H in H1. rewrite H1 in H3. discriminate.
-Qed.
-
 Theorem hoare_assert: forall P (b: bexp),
-  {{b /\ P}} assert b {{P}}.
+  {{P /\ b}} assert b {{P}}.
 Proof.
   unfold hoare_triple. intros.
   inversion H; subst.
@@ -393,26 +381,6 @@ Qed.
 (* ================================================================= *)
 (* EXERCISE 3.2: State and prove [hoare_assume]                      *)
 (* ================================================================= *)
-
-Theorem hoare_assumeERRADO: forall (P:Assertion) (b:bexp),
-  {{P}} assume b {{P}}.
-Proof.
-  unfold hoare_triple. intros.
-  inversion H. subst.
-  exists st. split.
-  - reflexivity.
-  - assumption.
-Qed.
-
-Theorem hoare_assumeIDK: forall (P:Assertion) (b:bexp),
-  {{b ->> P}} assume b {{P}}.
-Proof.
-  unfold hoare_triple, "->>". intros.
-  inversion H. subst.
-  exists st. split.
-  - reflexivity.
-  - apply H0 in H2. assumption.
-Qed.
 
 Theorem hoare_assume: forall (P:Assertion) (b:bexp),
   {{P}} assume b {{P /\ b}}.
@@ -757,8 +725,8 @@ Notation "'assume' l {{ P }}"
   := (DCAssume l P)
   (in custom com at level 8, 
    l custom com at level 0, P constr at level 0) : dcom_scope.
-Notation " c1 !! c2 " :=
-  (CNonDetChoice c1 c2)
+Notation " d1 !! d2 " :=
+  (DCNonDetChoice d1 d2)
     (in custom com at level 90, 
      right associativity) : dcom_scope.
 
@@ -1003,9 +971,9 @@ Fixpoint verification_conditions (P : Assertion) (d : dcom) : Prop :=
       verification_conditions P d
       /\ (post d ->> Q)
   | DCAssert b Q =>
-      ((P /\ b) ->> Q)%assertion
-  | DCAssume b Q =>
       (P ->> (Q /\ b))%assertion
+  | DCAssume b Q =>
+      ((P /\ b) ->> Q)%assertion
   | DCNonDetChoice d1 d2 =>
       verification_conditions P d1 /\ verification_conditions P d2
   end.
@@ -1057,19 +1025,17 @@ Proof.
   - (* Assert *)
     eapply hoare_consequence_pre.
       + apply hoare_assert. 
-      + admit.
+      + assumption.
   - (* Assume *)
     eapply hoare_consequence_post.
       + apply hoare_assume.
-      + admit.
+      + assumption.
   - (* NonDetChoice *)
     destruct H as [Hd1 Hd2].
-    eapply hoare_consequence_pre.
-      + apply hoare_choice'.
-        * admit.
-        * admit.
-      + admit.
-Admitted.
+    apply hoare_choice'.
+      + eapply hoare_consequence_post. apply IHd1. assumption. auto.
+      + eapply hoare_consequence_post. apply IHd2. assumption. auto.
+Qed.
 
 
 (** Now that all the pieces are in place, we can define what it means
@@ -1274,23 +1240,25 @@ Proof. verify. Qed.
 (* TODO: fill in the assertions *)
 Definition sqrt_dec (m:nat) : decorated :=
   <{
-    {{ FILL_IN_HERE }} ->>
-    {{ FILL_IN_HERE }}
+    {{ X=m }} ->>
+    {{ X=m /\ 0*0 <= m }}
       Z := 0
-                    {{ FILL_IN_HERE }};
+                    {{ X=m /\ Z*Z <= m }};
       while ((Z+1)*(Z+1) <= X) do
-                    {{ FILL_IN_HERE  }} ->>
-                    {{ FILL_IN_HERE }}
+                    {{ X=m /\ Z*Z<=m /\ (Z+1)*(Z+1)<=X  }} ->>
+                    {{ X=m /\ (Z+1)*(Z+1)<=m }}
         Z := Z + 1
-                    {{ FILL_IN_HERE }}
+                    {{ X=m /\ Z*Z<=m }}
       end
-    {{ FILL_IN_HERE }} ->>
-    {{ FILL_IN_HERE }}
+    {{ X=m /\ Z*Z<=m /\ ~((Z+1)*(Z+1)<=X) }} ->>
+    {{ Z*Z<=m /\ m<(Z+1)*(Z+1) }}
   }>.
 
 Theorem sqrt_correct : forall m,
   outer_triple_valid (sqrt_dec m).
-Proof. (* TODO *) Admitted.
+Proof.
+  verify.
+Qed.
 
 
 
@@ -1357,19 +1325,38 @@ Definition parity_dec_nondet (m:nat) : decorated :=
 should not be changed. Note that the code below does
 not typecheck until you decorate it correctly. *)
 <{
-  {{ X = m }}
+  {{ X = m }} ->>
+  {{ fun st : state => parity (st X) = parity m }}
     while 2 <= X do
+    {{ fun st : state => parity (st X) = parity m /\ 2 <= st X }} 
       X := X - 2
+      {{ fun st : state => parity (st X) = parity m }}
       !! 
       X := X + 2
+      {{ fun st : state => parity (st X) = parity m }}
     end
+    {{ fun st : state => parity (st X) = parity m /\ ~ (2 <= st X) }} ->>
   {{ X = parity m }} }>.
 
 
 Theorem parity_outer_triple_valid_nondet : forall m,
   outer_triple_valid (parity_dec_nondet m).
 Proof. 
-  (* TODO *)
+  verify.
+  - destruct (st X).
+    + discriminate.
+    + destruct n.
+      * discriminate.
+      * lia.
+  - destruct (st X).
+    + lia.
+    + destruct n.
+      * lia.
+      * discriminate.
+  - rewrite <- H. apply parity_ge_2. assumption.
+  - rewrite <- H. apply parity_plus_2.
+  - rewrite <- H. symmetry. apply parity_lt_2. assumption.
+    
 Qed.
 
 
