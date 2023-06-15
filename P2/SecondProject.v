@@ -375,7 +375,7 @@ Proof.
   - exists st. split.
     + reflexivity.
     + apply H0.   
-  - destruct H0 as (Hb & HP). rewrite Hb in H2. discriminate.
+  - destruct H0 as (HP & Hb). rewrite Hb in H2. discriminate.
 Qed.
 
 (* ================================================================= *)
