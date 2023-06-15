@@ -466,14 +466,10 @@ Inductive cstep : (com * result)  -> (com * result) -> Prop :=
   | CS_While : forall st b c1,
       <{while b do c1 end}> / st 
       --> <{ if b then (c1; while b do c1 end) else skip end }> / st
-  | CS_Par1 : forall st c1 c1' c2 st',
-      c1 / st --> c1' / st' ->
-      <{ c1 !! c2 }> / st --> <{ c1' !! c2 }> / st'
-  | CS_Par2 : forall st c1 c2 c2' st',
-      c2 / st --> c2' / st' ->
-      <{ c1 !! c2 }> / st --> <{ c1 !! c2' }> / st'
-  | CS_ParDone : forall st,
-      <{ skip !! skip }> / st --> <{ skip }> / st
+  | CS_NonDetChoice1 : forall st c1 c2,
+      <{ c1 !! c2 }> / st --> <{ c1 }> / st
+  | CS_NonDetChoice2 : forall st c1 c2,
+      <{ c1 !! c2 }> / st --> <{ c2 }> / st
   | CS_AssertStep : forall st b b',
       b / st -->b b' ->
       <{ assert b }> / RNormal st --> <{ assert b' }> / RNormal st
@@ -546,7 +542,25 @@ Example prog1_example1:
        prog1 / RNormal (X !-> 1) -->* <{ skip }> / RNormal st'
     /\ st' X = 2.
 Proof.
-  (* TODO *)
+  eexists. split.
+  unfold prog1.
+
+  eapply multi_step. apply CS_SeqStep.
+  apply CS_AssumeStep. apply BS_Eq1. apply AS_Id.
+  eapply multi_step. apply CS_SeqStep. apply CS_AssumeStep. apply BS_Eq.
+  simpl. eapply multi_step. apply CS_SeqStep. apply CS_AssumeTrue. eapply multi_step.
+  apply CS_SeqFinish.
+
+  eapply multi_step. apply CS_SeqStep.
+  apply CS_NonDetChoice1. eapply multi_step. apply CS_SeqStep. apply CS_AssStep.
+  apply AS_Plus1. apply AS_Id. eapply multi_step. apply CS_SeqStep. apply CS_AssStep.
+  apply AS_Plus. simpl. eapply multi_step. apply CS_SeqStep. apply CS_Asgn. eapply multi_step.
+  apply CS_SeqFinish.
+
+  eapply multi_step. apply CS_AssertStep. apply BS_Eq1. apply AS_Id. eapply multi_step.
+  apply CS_AssertStep. apply BS_Eq. simpl. eapply multi_step. apply CS_AssertTrue. eapply multi_refl.
+
+  reflexivity.
 Qed.
 
 
