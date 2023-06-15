@@ -1340,16 +1340,16 @@ should not be changed. Note that the code below does
 not typecheck until you decorate it correctly. *)
 <{
   {{ X = m }} ->>
-  {{ fun st : state => parity (st X) = parity m }}
+  {{ ap parity X = parity m }}
     while 2 <= X do
-    {{ fun st : state => parity (st X) = parity m /\ 2 <= st X }} 
+    {{ ap parity X = parity m /\ 2 <= X }} 
       X := X - 2
-      {{ fun st : state => parity (st X) = parity m }}
+      {{ ap parity X = parity m }}
       !! 
       X := X + 2
-      {{ fun st : state => parity (st X) = parity m }}
+      {{ ap parity X = parity m }}
     end
-    {{ fun st : state => parity (st X) = parity m /\ ~ (2 <= st X) }} ->>
+    {{ ap parity X = parity m /\ ~ (2 <= X) }} ->>
   {{ X = parity m }} }>.
 
 
@@ -1370,9 +1370,7 @@ Proof.
   - rewrite <- H. apply parity_ge_2. assumption.
   - rewrite <- H. apply parity_plus_2.
   - rewrite <- H. symmetry. apply parity_lt_2. assumption.
-    
 Qed.
-
 
 End DCom.
 
