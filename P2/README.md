@@ -26,9 +26,9 @@ coq_makefile -f _CoqProject -o Makefile
 
 ### João
 7. Extend the language, 1 point
-8. Extend the extract post, 1 point
+8. Extend the extract and post, 1 point
+
 9. Extend verification_conditions, 2 points
 10. Proof verification_correct, 2 points
-
 11. Fill assertions in sqrt_dec and prove sqrt_correct, 0.5 points
 12. Hoare Logic cenas, 3 points
