@@ -573,13 +573,8 @@ Lemma one_step_aeval_a: forall st a a',
   aeval st a = aeval st a'.
 Proof.
   intros st a a' H.
-  induction H; try reflexivity.
-  - simpl. rewrite IHastep. reflexivity.
-  - simpl. rewrite IHastep. reflexivity.
-  - simpl. rewrite IHastep. reflexivity. 
-  - simpl. rewrite IHastep. reflexivity.
-  - simpl. rewrite IHastep. reflexivity. 
-  - simpl. rewrite IHastep. reflexivity.
+  induction H; try reflexivity;
+  simpl; rewrite IHastep; reflexivity.
 Qed.
 
 
