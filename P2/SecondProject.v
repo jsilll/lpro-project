@@ -414,6 +414,15 @@ Qed.
 (*               words what this example is demonstrating.           *)                                            
 (* ================================================================= *)
 
+(*
+  This example is demonstrating the idea that if P implies ~ b (P and b are
+contradictory for all states), then the Hoare triple {{P}} assume b; c {{Q}}
+is always valid, independently of the command c and of the post-condition Q.
+  This happens because starting in a state that satisfies P, b evaluates to
+false and so the assume command will fail to evaluate. Thus, by definition,
+the Hoare triple is vacuously true, given that the command doesn't terminate.
+*)
+
 Example assert_assume_example:
   {{ X = 1 }}
   assume (X = 2);
