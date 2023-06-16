@@ -216,7 +216,7 @@ Proof.
   unfold hoare_triple. intros.
   inversion H0. subst. 
   rewrite H in H3.
-  inversion H3.
+  discriminate.
 Qed.
 
 Theorem assert_implies_assume : forall P b Q,
@@ -226,8 +226,8 @@ Proof.
   unfold hoare_triple. intros.
   inversion H0; subst.
   specialize (H st (RNormal st)).
-  apply H; try assumption.
-  - apply E_AssertTrue. assumption.
+  apply H; try assumption;
+  apply E_AssertTrue. assumption.
 Qed.
 
 
@@ -392,12 +392,11 @@ Proof.
   - split; assumption.
 Qed.
 
-
 (* ================================================================= *)
 (* EXERCISE 3.3: State and prove [hoare_choice]                      *)
 (* ================================================================= *)
 
-Theorem hoare_choice' : forall P c1 c2 Q,
+Theorem hoare_choice : forall P c1 c2 Q,
   {{P}} c1 {{Q}} ->
   {{P}} c2 {{Q}} ->
   {{P}} c1 !! c2 {{Q}}.
@@ -408,7 +407,6 @@ Proof.
   - apply Hc1 in H3; assumption.
   - apply Hc2 in H3; assumption.
 Qed.
-
 
 (* ================================================================= *)
 (* EXERCISE 3.4: Use the proof rules defined to prove the following  *)
@@ -731,7 +729,7 @@ Notation "{{ P }} d"
       := (Decorated P d)
       (in custom com at level 91, P constr) : dcom_scope.
 
-(* TODO: Notation for the three new constructs *)
+(* Notation for the three new constructs *)
 
 Notation "'assert' l {{ P }}"
   := (DCAssert l P)
@@ -1048,7 +1046,7 @@ Proof.
       + assumption.
   - (* NonDetChoice *)
     destruct H as [Hd1 Hd2].
-    apply hoare_choice'.
+    apply hoare_choice.
       + eapply hoare_consequence_post. apply IHd1. assumption. auto.
       + eapply hoare_consequence_post. apply IHd2. assumption. auto.
 Qed.
@@ -1253,7 +1251,6 @@ Proof. verify. Qed.
     Hint: The loop invariant here must ensure that Z*Z is consistently
     less than or equal to X. *)
 
-(* TODO: fill in the assertions *)
 Definition sqrt_dec (m:nat) : decorated :=
   <{
     {{ X=m }} ->>
@@ -1337,7 +1334,7 @@ Qed.
 
 
 Definition parity_dec_nondet (m:nat) : decorated :=
-(* TODO: write a decorated version of the program shown above. The pre and post-conditions
+(* Write a decorated version of the program shown above. The pre and post-conditions
 should not be changed. Note that the code below does
 not typecheck until you decorate it correctly. *)
 <{
